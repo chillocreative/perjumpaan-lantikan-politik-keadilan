@@ -178,9 +178,8 @@ async function submit() {
 
         const response = await axios.post(props.verifyUrl, payload);
 
-        successMessage.value = response.data.message;
         resetForm();
-        emit('verified');
+        emit('verified', response.data.message);
     } catch (error) {
         if (error.response?.status === 422) {
             const serverErrors = error.response.data.errors || {};

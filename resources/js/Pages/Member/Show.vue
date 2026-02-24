@@ -12,6 +12,13 @@ const categoryLabels = {
     wanita: 'Wanita Cabang',
     mpkk: 'MPKK',
 };
+
+const statusLabels = {
+    present: 'Hadir',
+    absent: 'Tidak Hadir',
+    late: 'Lewat',
+    excused: 'Dimaafkan',
+};
 </script>
 
 <template>
@@ -91,7 +98,7 @@ const categoryLabels = {
                                                 'bg-white/10 text-sky-200 ring-1 ring-white/15': attendance.status === 'excused',
                                             }"
                                         >
-                                            {{ attendance.status }}
+                                            {{ statusLabels[attendance.status] || attendance.status }}
                                         </span>
                                     </td>
                                 </tr>

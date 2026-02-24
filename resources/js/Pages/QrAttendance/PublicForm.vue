@@ -1,5 +1,6 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import KehadiranForm from '@/Components/KehadiranForm.vue';
 
 const props = defineProps({
@@ -20,8 +21,10 @@ const categoryColors = {
 
 const colors = categoryColors[props.category] || categoryColors.matc;
 
-function onVerified() {
-    router.reload({ only: ['attendances'] });
+const successMessage = ref('');
+
+function onVerified(message) {
+    successMessage.value = message;
 }
 </script>
 
@@ -74,8 +77,23 @@ function onVerified() {
                 </div>
             </div>
 
+            <!-- Success Page -->
+            <div v-if="successMessage" class="rounded-2xl bg-white/10 p-6 shadow-xl backdrop-blur-md ring-1 ring-white/20 text-center sm:p-8">
+                <svg class="mx-auto h-16 w-16 text-emerald-400 sm:h-20 sm:w-20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h2 class="mt-4 text-xl font-bold text-white sm:text-2xl">Berjaya!</h2>
+                <p class="mt-2 text-sm text-sky-100/80 sm:text-base">{{ successMessage }}</p>
+                <Link href="/" class="mt-6 inline-flex items-center gap-2 rounded-xl bg-sky-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition hover:bg-sky-400 sm:text-base">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                    Kembali ke Halaman Utama
+                </Link>
+            </div>
+
             <!-- No Meeting -->
-            <div v-if="!meeting" class="rounded-2xl bg-white/10 p-6 shadow-xl backdrop-blur-md ring-1 ring-white/20 text-center sm:p-8">
+            <div v-else-if="!meeting" class="rounded-2xl bg-white/10 p-6 shadow-xl backdrop-blur-md ring-1 ring-white/20 text-center sm:p-8">
                 <svg class="mx-auto h-10 w-10 text-sky-300/40 sm:h-12 sm:w-12" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                 </svg>
@@ -84,20 +102,17 @@ function onVerified() {
             </div>
 
             <!-- Form Card -->
-            <template v-else>
-                <div class="rounded-2xl bg-white/10 p-4 shadow-xl backdrop-blur-md ring-1 ring-white/20 sm:p-6 lg:p-8">
-                    <h2 class="text-base font-semibold text-white mb-4 sm:text-lg sm:mb-5">Maklumat Kehadiran</h2>
-                    <KehadiranForm
-                        :category="category"
-                        :meeting-id="meeting.id"
-                        :verify-url="verifyUrl"
-                        :form-token="formToken || ''"
-                        :dark="true"
-                        @verified="onVerified"
-                    />
-                </div>
-
-            </template>
+            <div v-else class="rounded-2xl bg-white/10 p-4 shadow-xl backdrop-blur-md ring-1 ring-white/20 sm:p-6 lg:p-8">
+                <h2 class="text-base font-semibold text-white mb-4 sm:text-lg sm:mb-5">Maklumat Kehadiran</h2>
+                <KehadiranForm
+                    :category="category"
+                    :meeting-id="meeting.id"
+                    :verify-url="verifyUrl"
+                    :form-token="formToken || ''"
+                    :dark="true"
+                    @verified="onVerified"
+                />
+            </div>
         </div>
     </div>
 </template>
