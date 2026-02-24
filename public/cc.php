@@ -7,55 +7,49 @@ if (($_GET['t'] ?? '') !== 'Kd9xM2pL7qRnW4vZ') {
 header('Content-Type: text/plain');
 $root = dirname(__DIR__);
 
-// Bootstrap full Laravel
 require $root . '/vendor/autoload.php';
 $app = require_once $root . '/bootstrap/app.php';
 $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use App\Enums\CategoryType;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 
-$categoryEnum = CategoryType::Mpkk;
-$positions = $categoryEnum->positions();
-$allPositions = implode(',', CategoryType::allPositions());
+// Simulate the exact same request the browser sends
+$request = Request::create('/mpkk', 'POST', [
+    'name' => 'TEST',
+    'ic_number' => '780912345678',
+    'phone_number' => '0190002222',
+    'address' => 'TEST',
+    'position_type' => 'Setiausaha',
+    'mpkk_name' => 'MPKK KG SELAMAT UTARA',
+    'status' => 'hadir',
+    'absence_reason' => null,
+    'website' => '',
+    '_ft' => Crypt::encryptString((string) now()->timestamp),
+]);
+$request->headers->set('Accept', 'application/json');
 
-echo "=== Positions ===\n";
-echo implode(', ', $positions) . "\n\n";
+// Call the controller directly (bypass middleware)
+$controller = $app->make(\App\Http\Controllers\QrAttendanceController::class);
 
-echo "=== allPositions implode string ===\n";
-echo $allPositions . "\n\n";
+echo "=== Calling publicVerify('mpkk') directly ===\n\n";
 
-$testValue = 'Setiausaha';
-
-// Test OLD approach (string-based in:)
-$oldValidator = Validator::make(
-    ['position_type' => $testValue],
-    ['position_type' => ['required', 'string', "in:{$allPositions}"]]
-);
-echo "OLD in: rule for '$testValue': " . ($oldValidator->fails() ? 'FAILS - ' . $oldValidator->errors()->first() : 'PASSES') . "\n";
-
-// Test NEW approach (Rule::in)
-$newValidator = Validator::make(
-    ['position_type' => $testValue],
-    ['position_type' => ['required', 'string', Rule::in($positions)]]
-);
-echo "NEW Rule::in for '$testValue': " . ($newValidator->fails() ? 'FAILS - ' . $newValidator->errors()->first() : 'PASSES') . "\n";
-
-// Test all MPKK positions with OLD rule
-echo "\n=== All MPKK positions with OLD in: rule ===\n";
-foreach (['Pengerusi', 'Timbalan Pengerusi', 'Setiausaha', 'Bendahari', 'AJK'] as $pos) {
-    $v = Validator::make(['position_type' => $pos], ['position_type' => ['required', 'string', "in:{$allPositions}"]]);
-    echo "'$pos': " . ($v->fails() ? 'FAILS' : 'PASSES') . "\n";
+try {
+    // Use DB transaction to avoid creating actual records
+    \Illuminate\Support\Facades\DB::beginTransaction();
+    $response = $controller->publicVerify($request, 'mpkk');
+    echo "Status: " . $response->getStatusCode() . "\n";
+    echo "Body: " . $response->getContent() . "\n";
+    \Illuminate\Support\Facades\DB::rollBack();
+} catch (\Illuminate\Validation\ValidationException $e) {
+    echo "VALIDATION FAILED:\n";
+    foreach ($e->errors() as $field => $messages) {
+        echo "  $field: " . implode(', ', $messages) . "\n";
+    }
+    \Illuminate\Support\Facades\DB::rollBack();
+} catch (\Throwable $e) {
+    echo "EXCEPTION: " . get_class($e) . "\n";
+    echo "Message: " . $e->getMessage() . "\n";
+    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
+    \Illuminate\Support\Facades\DB::rollBack();
 }
-
-// Show which controller class is actually loaded
-$ref = new ReflectionMethod(\App\Http\Controllers\QrAttendanceController::class, 'processVerify');
-$source = file_get_contents($ref->getFileName());
-$startLine = $ref->getStartLine();
-$endLine = $ref->getEndLine();
-$lines = array_slice(explode("\n", $source), $startLine - 1, $endLine - $startLine + 1);
-$methodSrc = implode("\n", $lines);
-echo "\n=== processVerify loaded from: {$ref->getFileName()} (lines {$startLine}-{$endLine}) ===\n";
-echo "Has Rule::in: " . (str_contains($methodSrc, 'Rule::in') ? 'YES' : 'NO - STILL OLD CODE') . "\n";
-echo "Has in:\$allPositions: " . (str_contains($methodSrc, 'in:{$allPositions}') ? 'YES - OLD CODE RUNNING' : 'NO') . "\n";
