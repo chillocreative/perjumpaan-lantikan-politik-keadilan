@@ -13,6 +13,7 @@ use App\Services\BruteForceProtection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
@@ -117,15 +118,13 @@ class QrAttendanceController extends Controller
             return $this->errorResponse($request, "Terlalu banyak percubaan gagal. Sila cuba selepas {$minutes} minit.", 429);
         }
 
-        $allPositions = implode(',', CategoryType::allPositions());
-
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'ic_number' => ['required', 'string', 'max:20', new MalaysianIc],
             'phone_number' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:500'],
             'mpkk_name' => [$categoryEnum === CategoryType::Mpkk ? 'required' : 'nullable', 'string', 'max:255'],
-            'position_type' => ['required', 'string', "in:{$allPositions}"],
+            'position_type' => ['required', 'string', Rule::in($categoryEnum->positions())],
             'status' => ['required', 'string', 'in:hadir,tidak_hadir'],
             'absence_reason' => ['nullable', 'string', 'max:500', 'required_if:status,tidak_hadir'],
         ]);
