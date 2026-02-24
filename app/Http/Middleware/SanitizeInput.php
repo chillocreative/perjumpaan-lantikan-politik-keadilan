@@ -16,6 +16,8 @@ class SanitizeInput
         'current_password',
         'email',
         'ic_number',
+        'position_type',
+        'status',
         '_token',
         '_ft',
         'website',
