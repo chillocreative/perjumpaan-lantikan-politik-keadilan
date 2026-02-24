@@ -131,7 +131,7 @@ const statusColors = {
                                     <tr v-for="attendance in attendances" :key="attendance.id" class="hover:bg-white/5">
                                         <td class="whitespace-nowrap px-6 py-4 text-sm text-white uppercase">{{ attendance.member?.name }}</td>
                                         <td class="whitespace-nowrap px-6 py-4 text-sm text-sky-200/50 uppercase">{{ attendance.member?.ic_number }}</td>
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-sky-200/80 uppercase">{{ categoryLabels[attendance.member?.category_type] || '-' }}</td>
+                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-sky-200/80 uppercase">{{ attendance.member?.category_type === 'mpkk' ? (attendance.member?.position_name || 'MPKK') : (categoryLabels[attendance.member?.category_type] || '-') }}</td>
                                         <td class="whitespace-nowrap px-6 py-4 text-sm text-sky-200/50 uppercase">{{ attendance.member?.position_type || '-' }}</td>
                                         <td v-if="selectedCategory === 'mpkk'" class="whitespace-nowrap px-6 py-4 text-sm text-sky-200/50 uppercase">{{ attendance.member?.position_name || '-' }}</td>
                                         <td class="px-6 py-4 text-sm text-sky-200/80 uppercase">{{ attendance.member?.address || '-' }}</td>

@@ -123,7 +123,7 @@ const categoryLabels = {
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-sky-200/50 uppercase">{{ member.ic_number }}</td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <span class="inline-flex items-center rounded-full bg-sky-400/15 px-2.5 py-0.5 text-xs font-medium text-sky-300 ring-1 ring-sky-400/20 uppercase">
-                                            {{ categoryLabels[member.category_type] || member.category_type }}
+                                            {{ member.category_type === 'mpkk' ? (member.position_name || 'MPKK') : (categoryLabels[member.category_type] || member.category_type) }}
                                         </span>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-sky-200/50 uppercase">{{ member.position_type || '-' }}</td>
