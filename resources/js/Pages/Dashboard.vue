@@ -17,11 +17,11 @@ const selectedMpkkData = computed(() => {
 });
 
 const mpkkTotalHadir = computed(() => {
-    return props.mpkk_attendance.reduce((sum, m) => sum + m.hadir, 0);
+    return props.mpkk_attendance.reduce((sum, m) => sum + Number(m.hadir), 0);
 });
 
 const mpkkTotalAll = computed(() => {
-    return props.mpkk_attendance.reduce((sum, m) => sum + m.total, 0);
+    return props.mpkk_attendance.reduce((sum, m) => sum + Number(m.total), 0);
 });
 
 const statCards = [
