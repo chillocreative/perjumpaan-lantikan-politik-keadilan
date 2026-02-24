@@ -41,6 +41,13 @@ const categoryLabels = {
     mpkk: 'MPKK',
 };
 
+const statusLabels = {
+    present: 'Hadir',
+    absent: 'Tidak Hadir',
+    late: 'Lewat',
+    excused: 'Dimaafkan',
+};
+
 const statusColors = {
     present: 'bg-emerald-400/15 text-emerald-300 ring-1 ring-emerald-400/20',
     absent: 'bg-red-400/15 text-red-300 ring-1 ring-red-400/20',
@@ -125,6 +132,7 @@ const statusColors = {
                                         <th v-if="selectedCategory === 'mpkk'" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">MPKK</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">Alamat</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">Sebab</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-white/10">
@@ -140,14 +148,15 @@ const statusColors = {
                                                 class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                                                 :class="statusColors[attendance.status] || 'bg-white/10 text-sky-200 ring-1 ring-white/15'"
                                             >
-                                                {{ attendance.status }}
+                                                {{ statusLabels[attendance.status] || attendance.status }}
                                             </span>
                                         </td>
+                                        <td class="px-6 py-4 text-sm text-sky-200/50 uppercase">{{ attendance.status === 'absent' ? (attendance.absence_reason || '-') : '-' }}</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <p v-if="!attendances.length" class="text-sm text-sky-200/50">Tiada rekod kehadiran untuk mesyuarat ini.</p>
+                        <p v-if="!attendances.length" class="text-sm text-sky-200/50 mt-4">Tiada rekod kehadiran untuk mesyuarat ini.</p>
                     </div>
                 </div>
 
