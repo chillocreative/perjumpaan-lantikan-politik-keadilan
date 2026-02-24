@@ -51,6 +51,12 @@ const mpkkOptions = [
     'MPKK KG SELAMAT SELATAN',
     'MPKK KUBANG MENERONG',
     'MPKK KG TOK BEDU',
+    'MPKK KG DATUK',
+    'MPKK PERMATANG SINTOK',
+    'MPKK PERMATANG RAMBAI',
+    'MPKK JALAN KEDAH',
+    'MPKK PADANG BENGGALI',
+    'MPKK DUN PENAGA',
 ];
 
 const loading = ref(false);

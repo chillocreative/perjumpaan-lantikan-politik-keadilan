@@ -1,10 +1,27 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
     stats: Object,
+    mpkk_attendance: Array,
     upcoming_meetings: Array,
+});
+
+const selectedMpkk = ref('');
+
+const selectedMpkkData = computed(() => {
+    if (!selectedMpkk.value) return null;
+    return props.mpkk_attendance.find(m => m.name === selectedMpkk.value);
+});
+
+const mpkkTotalHadir = computed(() => {
+    return props.mpkk_attendance.reduce((sum, m) => sum + m.hadir, 0);
+});
+
+const mpkkTotalAll = computed(() => {
+    return props.mpkk_attendance.reduce((sum, m) => sum + m.total, 0);
 });
 
 const statCards = [
@@ -47,6 +64,76 @@ const statCards = [
                             <span class="text-2xl font-bold text-white sm:text-3xl">{{ stats[card.key].tidak_hadir }}</span>
                             <span class="ml-1 text-sm text-red-300">Tidak Hadir</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- MPKK Attendance Card -->
+                <div v-if="mpkk_attendance.length" class="mt-6 rounded-2xl bg-white/10 p-4 shadow-lg backdrop-blur-md ring-1 ring-white/15 sm:mt-8 sm:p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                            <h3 class="text-base font-semibold text-white sm:text-lg">Kehadiran MPKK</h3>
+                            <p class="mt-1 text-sm text-sky-200/50">Pilih MPKK untuk lihat status kehadiran.</p>
+                        </div>
+                        <div class="text-sm text-amber-300 font-medium">
+                            Jumlah: {{ mpkkTotalHadir }} / {{ mpkkTotalAll }} orang
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <select
+                            v-model="selectedMpkk"
+                            class="w-full rounded-lg border-0 bg-white/10 text-white ring-1 ring-white/15 focus:ring-2 focus:ring-amber-400 sm:max-w-md"
+                        >
+                            <option value="" class="bg-sky-900 text-white">-- Pilih MPKK --</option>
+                            <option v-for="m in mpkk_attendance" :key="m.name" :value="m.name" class="bg-sky-900 text-white">
+                                {{ m.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Selected MPKK Result -->
+                    <div v-if="selectedMpkkData" class="mt-4 rounded-xl bg-amber-500/10 p-4 ring-1 ring-amber-400/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-amber-200">{{ selectedMpkkData.name }}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-3xl font-bold text-white">{{ selectedMpkkData.hadir }}</span>
+                                <span class="text-lg text-amber-300/70"> / {{ selectedMpkkData.total }}</span>
+                                <span class="ml-1 text-sm text-amber-300/70">orang</span>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="h-2 rounded-full bg-white/10 overflow-hidden">
+                                <div
+                                    class="h-full rounded-full transition-all duration-500"
+                                    :class="selectedMpkkData.hadir >= selectedMpkkData.total ? 'bg-emerald-400' : 'bg-amber-400'"
+                                    :style="{ width: (selectedMpkkData.total > 0 ? Math.min(100, (selectedMpkkData.hadir / selectedMpkkData.total) * 100) : 0) + '%' }"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- All MPKK Summary Table -->
+                    <div class="mt-4 overflow-x-auto">
+                        <table class="min-w-full divide-y divide-white/10">
+                            <thead class="bg-white/5">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">MPKK</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-sky-200/60">Hadir</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-sky-200/60">Jumlah</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-sky-200/60">%</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/10">
+                                <tr v-for="m in mpkk_attendance" :key="m.name" class="hover:bg-white/5">
+                                    <td class="px-4 py-2 text-sm text-white">{{ m.name }}</td>
+                                    <td class="px-4 py-2 text-sm text-right" :class="m.hadir >= m.total ? 'text-emerald-300 font-semibold' : 'text-amber-300'">{{ m.hadir }}</td>
+                                    <td class="px-4 py-2 text-sm text-right text-sky-200/50">{{ m.total }}</td>
+                                    <td class="px-4 py-2 text-sm text-right text-sky-200/50">{{ m.total > 0 ? Math.round((m.hadir / m.total) * 100) : 0 }}%</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
