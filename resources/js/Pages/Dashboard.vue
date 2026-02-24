@@ -114,27 +114,6 @@ const statCards = [
                         </div>
                     </div>
 
-                    <!-- All MPKK Summary Table -->
-                    <div class="mt-4 overflow-x-auto">
-                        <table class="min-w-full divide-y divide-white/10">
-                            <thead class="bg-white/5">
-                                <tr>
-                                    <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">MPKK</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-sky-200/60">Hadir</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-sky-200/60">Jumlah</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-sky-200/60">%</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-white/10">
-                                <tr v-for="m in mpkk_attendance" :key="m.name" class="hover:bg-white/5">
-                                    <td class="px-4 py-2 text-sm text-white">{{ m.name }}</td>
-                                    <td class="px-4 py-2 text-sm text-right" :class="m.hadir >= m.total ? 'text-emerald-300 font-semibold' : 'text-amber-300'">{{ m.hadir }}</td>
-                                    <td class="px-4 py-2 text-sm text-right text-sky-200/50">{{ m.total }}</td>
-                                    <td class="px-4 py-2 text-sm text-right text-sky-200/50">{{ m.total > 0 ? Math.round((m.hadir / m.total) * 100) : 0 }}%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
 
                 <!-- QR Code -->
