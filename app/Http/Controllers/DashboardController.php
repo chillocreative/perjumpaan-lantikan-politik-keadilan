@@ -89,11 +89,11 @@ class DashboardController extends Controller
             'MPKK DUN PENAGA' => 14,
         ];
 
-        $counts = Attendance::where('meeting_id', $meeting->id)
-            ->where('category_type', 'mpkk')
-            ->where('status', AttendanceStatus::Present->value)
-            ->whereHas('member', fn ($q) => $q->whereIn('position_name', $mpkkList))
+        $counts = Attendance::where('attendances.meeting_id', $meeting->id)
+            ->where('attendances.category_type', 'mpkk')
+            ->where('attendances.status', AttendanceStatus::Present->value)
             ->join('members', 'attendances.member_id', '=', 'members.id')
+            ->whereIn('members.position_name', $mpkkList)
             ->selectRaw('members.position_name, count(*) as total')
             ->groupBy('members.position_name')
             ->pluck('total', 'position_name')
