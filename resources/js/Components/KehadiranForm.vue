@@ -221,12 +221,22 @@ function clearFieldError(field) {
     }
 }
 
-function forceUppercase(ref) {
-    ref.value = ref.value.toUpperCase();
+function onNameInput(e) {
+    name.value = (e.target.value || '').toUpperCase();
+    clearFieldError('name');
 }
 
-function forceDigits(ref) {
-    ref.value = ref.value.replace(/\D/g, '');
+function onPhoneInput(e) {
+    phone_number.value = (e.target.value || '').replace(/\D/g, '');
+}
+
+function onAddressInput(e) {
+    address.value = (e.target.value || '').toUpperCase();
+}
+
+function onAbsenceReasonInput(e) {
+    absence_reason.value = (e.target.value || '').toUpperCase();
+    clearFieldError('absence_reason');
 }
 </script>
 
@@ -315,7 +325,7 @@ function forceDigits(ref) {
                     v-model="name"
                     type="text"
                     autocomplete="name"
-                    @input="forceUppercase(name); clearFieldError('name')"
+                    @input="onNameInput"
                     class="mt-1 block w-full rounded-lg shadow-sm text-base sm:text-lg uppercase"
                     :class="[
                         dark
@@ -357,7 +367,7 @@ function forceDigits(ref) {
                     inputmode="numeric"
                     placeholder="0121234567"
                     autocomplete="tel"
-                    @input="forceDigits(phone_number)"
+                    @input="onPhoneInput"
                     class="mt-1 block w-full rounded-lg shadow-sm"
                     :class="dark ? 'border-0 bg-white/10 text-white placeholder-sky-300/40 ring-1 ring-white/15 focus:ring-2 focus:ring-sky-400' : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'"
                 />
@@ -370,7 +380,7 @@ function forceDigits(ref) {
                     id="address"
                     v-model="address"
                     rows="2"
-                    @input="forceUppercase(address)"
+                    @input="onAddressInput"
                     class="mt-1 block w-full rounded-lg shadow-sm uppercase"
                     :class="dark ? 'border-0 bg-white/10 text-white placeholder-sky-300/40 ring-1 ring-white/15 focus:ring-2 focus:ring-sky-400' : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'"
                 ></textarea>
@@ -430,7 +440,7 @@ function forceDigits(ref) {
                     id="absence_reason"
                     v-model="absence_reason"
                     rows="3"
-                    @input="forceUppercase(absence_reason); clearFieldError('absence_reason')"
+                    @input="onAbsenceReasonInput"
                     class="mt-1 block w-full rounded-lg shadow-sm uppercase"
                     :class="[
                         dark
