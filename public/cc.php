@@ -9,26 +9,35 @@ header('Content-Type: text/plain');
 $out = [];
 $root = dirname(__DIR__);
 
-// Force git pull
-exec('git -C ' . escapeshellarg($root) . ' pull origin main 2>&1', $gitLines, $gitCode);
-$out[] = 'git pull: ' . implode(' | ', $gitLines);
+// Target files that need recompiling
+$files = [
+    $root . '/app/Http/Controllers/QrAttendanceController.php',
+    $root . '/app/Enums/CategoryType.php',
+];
 
-// Check CategoryType.php on disk
+// Try opcache_invalidate() per-file (less restricted than opcache_reset)
+foreach ($files as $file) {
+    if (function_exists('opcache_invalidate')) {
+        $r = opcache_invalidate($file, true);
+        $out[] = 'opcache_invalidate(' . basename($file) . '): ' . ($r ? 'OK' : 'FAILED');
+    } else {
+        $out[] = 'opcache_invalidate: not available';
+    }
+    // Touch file to update mtime - forces OPcache to recompile if validate_timestamps=1
+    touch($file);
+    $out[] = 'touch(' . basename($file) . '): ' . (filemtime($file) > 0 ? 'OK mtime=' . filemtime($file) : 'FAILED');
+}
+
+// Verify file contents on disk
 $enumFile = $root . '/app/Enums/CategoryType.php';
-if (file_exists($enumFile)) {
-    $src = file_get_contents($enumFile);
-    $out[] = 'CategoryType has Mpkk positions: ' . (str_contains($src, "'Pengerusi'") ? 'YES' : 'NO - file is old');
-}
+$src = file_get_contents($enumFile);
+$out[] = 'CategoryType has Pengerusi: ' . (str_contains($src, "'Pengerusi'") ? 'YES' : 'NO - old file on disk');
 
-// Clear OPcache
-if (function_exists('opcache_reset')) {
-    opcache_reset();
-    $out[] = 'OPcache: cleared';
-} else {
-    $out[] = 'OPcache: not available';
-}
+$ctrlFile = $root . '/app/Http/Controllers/QrAttendanceController.php';
+$src2 = file_get_contents($ctrlFile);
+$out[] = 'Controller has Rule::in: ' . (str_contains($src2, 'Rule::in(') ? 'YES' : 'NO - old file on disk');
 
-// Run artisan cache clear
+// artisan optimize:clear
 exec('/usr/local/bin/php ' . escapeshellarg($root . '/artisan') . ' optimize:clear 2>&1', $artLines);
 $out[] = 'artisan optimize:clear: ' . implode(', ', $artLines);
 
