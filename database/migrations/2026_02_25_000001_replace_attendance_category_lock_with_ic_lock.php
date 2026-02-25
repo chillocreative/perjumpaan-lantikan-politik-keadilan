@@ -11,7 +11,25 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Remove duplicate IC entries per meeting (keep the earliest record)
+        $dbName = DB::getDatabaseName();
+
+        // Helper: check if a foreign key exists
+        $fkExists = fn (string $fk) => DB::selectOne(
+            "SELECT 1 FROM information_schema.TABLE_CONSTRAINTS
+             WHERE CONSTRAINT_SCHEMA = ? AND TABLE_NAME = 'attendances'
+               AND CONSTRAINT_NAME = ? AND CONSTRAINT_TYPE = 'FOREIGN KEY'",
+            [$dbName, $fk]
+        ) !== null;
+
+        // Helper: check if an index exists
+        $indexExists = fn (string $index) => DB::selectOne(
+            "SELECT 1 FROM information_schema.STATISTICS
+             WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'attendances'
+               AND INDEX_NAME = ?",
+            [$dbName, $index]
+        ) !== null;
+
+        // 1. Remove duplicate IC entries per meeting (safe to re-run)
         DB::statement('
             DELETE a FROM attendances a
             INNER JOIN (
@@ -24,17 +42,31 @@ return new class extends Migration
                   AND a.id != dups.keep_id
         ');
 
-        // Drop FK that depends on the unique index, then swap the index, then re-add FK
-        DB::statement('ALTER TABLE attendances DROP FOREIGN KEY attendances_meeting_id_foreign');
+        // 2. Drop FK only if it exists
+        if ($fkExists('attendances_meeting_id_foreign')) {
+            DB::statement('ALTER TABLE attendances DROP FOREIGN KEY attendances_meeting_id_foreign');
+        }
 
-        Schema::table('attendances', function (Blueprint $table) {
-            $table->dropUnique('attendance_category_lock');
-            $table->unique(['meeting_id', 'ic_number_hash'], 'attendance_ic_lock');
-        });
+        // 3. Drop old index only if it exists
+        if ($indexExists('attendance_category_lock')) {
+            Schema::table('attendances', function (Blueprint $table) {
+                $table->dropUnique('attendance_category_lock');
+            });
+        }
 
-        Schema::table('attendances', function (Blueprint $table) {
-            $table->foreign('meeting_id')->references('id')->on('meetings')->cascadeOnDelete();
-        });
+        // 4. Add new unique index only if it doesn't exist
+        if (!$indexExists('attendance_ic_lock')) {
+            Schema::table('attendances', function (Blueprint $table) {
+                $table->unique(['meeting_id', 'ic_number_hash'], 'attendance_ic_lock');
+            });
+        }
+
+        // 5. Re-add FK only if it doesn't exist
+        if (!$fkExists('attendances_meeting_id_foreign')) {
+            Schema::table('attendances', function (Blueprint $table) {
+                $table->foreign('meeting_id')->references('id')->on('meetings')->cascadeOnDelete();
+            });
+        }
     }
 
     public function down(): void
