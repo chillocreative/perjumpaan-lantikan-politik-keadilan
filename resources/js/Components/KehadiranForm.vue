@@ -56,7 +56,7 @@ const mpkkOptions = [
     'MPKK PERMATANG RAMBAI',
     'MPKK JALAN KEDAH',
     'MPKK PADANG BENGGALI',
-    'MPKK Kuala Muda',
+    'MPKK KUALA MUDA',
 ];
 
 const loading = ref(false);
