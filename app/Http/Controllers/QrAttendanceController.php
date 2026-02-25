@@ -136,7 +136,7 @@ class QrAttendanceController extends Controller
         } catch (\DomainException $e) {
             $this->bruteForce->recordFailedAttempt($ip);
 
-            return $this->errorResponse($request, $e->getMessage(), 422);
+            return $this->errorResponse($request, $e->getMessage(), 409);
         }
     }
 

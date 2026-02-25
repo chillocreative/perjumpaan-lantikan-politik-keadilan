@@ -63,6 +63,8 @@ const loading = ref(false);
 const errors = ref({});
 const successMessage = ref('');
 const errorMessage = ref('');
+const showDuplicateModal = ref(false);
+const duplicateMessage = ref('');
 
 const positionOptions = computed(() => {
     const positions = {
@@ -191,6 +193,9 @@ async function submit() {
             } else if (error.response.data?.message) {
                 errorMessage.value = error.response.data.message;
             }
+        } else if (error.response?.status === 409) {
+            duplicateMessage.value = error.response.data.message || 'IC ini sudah membuat pengesahan untuk mesyuarat ini.';
+            showDuplicateModal.value = true;
         } else if (error.response?.data?.message) {
             errorMessage.value = error.response.data.message;
         } else {
@@ -264,6 +269,47 @@ function onAbsenceReasonInput(e) {
                 <p class="ml-3 text-sm font-medium" :class="dark ? 'text-red-300' : 'text-red-800'">{{ errorMessage }}</p>
             </div>
         </div>
+
+        <!-- Duplicate IC Modal -->
+        <Teleport to="body">
+            <Transition
+                enter-active-class="transition ease-out duration-200"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition ease-in duration-150"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+                <div v-if="showDuplicateModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div class="fixed inset-0 bg-black/60" @click="showDuplicateModal = false"></div>
+                    <Transition
+                        enter-active-class="transition ease-out duration-200"
+                        enter-from-class="opacity-0 scale-95"
+                        enter-to-class="opacity-100 scale-100"
+                        leave-active-class="transition ease-in duration-150"
+                        leave-from-class="opacity-100 scale-100"
+                        leave-to-class="opacity-0 scale-95"
+                    >
+                        <div v-if="showDuplicateModal" class="relative w-full max-w-sm rounded-2xl p-6 text-center shadow-2xl" :class="dark ? 'bg-sky-900 ring-1 ring-white/10' : 'bg-white'">
+                            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full" :class="dark ? 'bg-red-500/20' : 'bg-red-100'">
+                                <svg class="h-7 w-7 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <h3 class="mb-2 text-lg font-bold" :class="dark ? 'text-white' : 'text-gray-900'">Rekod Telah Wujud</h3>
+                            <p class="mb-6 text-sm" :class="dark ? 'text-sky-100/70' : 'text-gray-600'">{{ duplicateMessage }}</p>
+                            <button
+                                @click="showDuplicateModal = false"
+                                class="w-full rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition"
+                                :class="dark ? 'bg-sky-500 hover:bg-sky-400' : 'bg-red-600 hover:bg-red-500'"
+                            >
+                                Tutup
+                            </button>
+                        </div>
+                    </Transition>
+                </div>
+            </Transition>
+        </Teleport>
 
         <form @submit.prevent="submit" class="space-y-4 sm:space-y-5">
             <!-- Honeypot -->
