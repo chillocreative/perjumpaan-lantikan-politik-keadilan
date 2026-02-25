@@ -56,7 +56,7 @@ const mpkkOptions = [
     'MPKK PERMATANG RAMBAI',
     'MPKK JALAN KEDAH',
     'MPKK PADANG BENGGALI',
-    'MPKK DUN PENAGA',
+    'MPKK Kuala Muda',
 ];
 
 const loading = ref(false);
@@ -98,7 +98,6 @@ const positionOptions = computed(() => {
         ],
         mpkk: [
             'Pengerusi',
-            'Timbalan Pengerusi',
             'Setiausaha',
             'Bendahari',
             'AJK',
