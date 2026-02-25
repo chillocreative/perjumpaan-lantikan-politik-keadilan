@@ -15,7 +15,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Inertia\Response;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -27,37 +26,18 @@ class QrAttendanceController extends Controller
         private readonly BruteForceProtection $bruteForce,
     ) {}
 
-    public function show(Request $request, string $category): Response
+    public function showQr(): Response
     {
-        $categoryEnum = CategoryType::fromSlug($category);
+        $url = config('app.url');
 
-        $meetings = Meeting::latest('date')->get(['id', 'title', 'date']);
-        $meetingId = $request->integer('meeting_id');
-        $meeting = $meetingId ? Meeting::findOrFail($meetingId) : null;
-
-        $qrCode = null;
-        $signedUrl = null;
-
-        if ($meeting) {
-            $signedUrl = URL::signedRoute('hadir', [
-                'category' => $categoryEnum->slug(),
-                'meeting' => $meeting->id,
-            ]);
-
-            $qrCode = (string) QrCode::format('svg')
-                ->size(300)
-                ->errorCorrection('H')
-                ->generate($signedUrl);
-        }
+        $qrCode = (string) QrCode::format('svg')
+            ->size(300)
+            ->errorCorrection('H')
+            ->generate($url);
 
         return Inertia::render('QrAttendance/Show', [
-            'category' => $categoryEnum->value,
-            'categoryLabel' => $categoryEnum->label(),
-            'categorySlug' => $categoryEnum->slug(),
-            'meeting' => $meeting,
-            'meetings' => $meetings,
             'qrCode' => $qrCode,
-            'signedUrl' => $signedUrl,
+            'url' => $url,
         ]);
     }
 

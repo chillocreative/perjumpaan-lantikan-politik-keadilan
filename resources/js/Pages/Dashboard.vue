@@ -119,11 +119,11 @@ const statCards = [
                 <!-- QR Code -->
                 <div class="mt-6 rounded-2xl bg-white/10 p-4 shadow-lg backdrop-blur-md ring-1 ring-white/15 sm:mt-8 sm:p-6">
                     <h3 class="text-base font-semibold text-white sm:text-lg">Jana QR Code</h3>
-                    <p class="mt-1 text-sm text-sky-200/50">Jana kod QR untuk pengesahan kehadiran mengikut kategori.</p>
-                    <div class="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                    <p class="mt-1 text-sm text-sky-200/50">Jana kod QR untuk pengesahan kehadiran.</p>
+                    <div class="mt-4">
                         <Link
-                            :href="route('admin.qr.matc')"
-                            class="flex items-center gap-3 rounded-xl bg-sky-500/15 px-4 py-3 ring-1 ring-sky-400/20 transition hover:bg-sky-500/25"
+                            :href="route('admin.qr')"
+                            class="inline-flex items-center gap-3 rounded-xl bg-sky-500/15 px-4 py-3 ring-1 ring-sky-400/20 transition hover:bg-sky-500/25"
                         >
                             <div class="rounded-lg bg-sky-400/15 p-2">
                                 <svg class="h-5 w-5 text-sky-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -132,52 +132,7 @@ const statCards = [
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-sm font-semibold text-white">Cabang</div>
-                                <div class="text-xs text-sky-200/50">QR kehadiran</div>
-                            </div>
-                        </Link>
-                        <Link
-                            :href="route('admin.qr.wanita')"
-                            class="flex items-center gap-3 rounded-xl bg-rose-500/15 px-4 py-3 ring-1 ring-rose-400/20 transition hover:bg-rose-500/25"
-                        >
-                            <div class="rounded-lg bg-rose-400/15 p-2">
-                                <svg class="h-5 w-5 text-rose-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75H16.5v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75H16.5v-.75z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="text-sm font-semibold text-white">Wanita Cabang</div>
-                                <div class="text-xs text-sky-200/50">QR kehadiran</div>
-                            </div>
-                        </Link>
-                        <Link
-                            :href="route('admin.qr.amk')"
-                            class="flex items-center gap-3 rounded-xl bg-emerald-500/15 px-4 py-3 ring-1 ring-emerald-400/20 transition hover:bg-emerald-500/25"
-                        >
-                            <div class="rounded-lg bg-emerald-400/15 p-2">
-                                <svg class="h-5 w-5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75H16.5v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75H16.5v-.75z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="text-sm font-semibold text-white">AMK</div>
-                                <div class="text-xs text-sky-200/50">QR kehadiran</div>
-                            </div>
-                        </Link>
-                        <Link
-                            :href="route('admin.qr.mpkk')"
-                            class="flex items-center gap-3 rounded-xl bg-amber-500/15 px-4 py-3 ring-1 ring-amber-400/20 transition hover:bg-amber-500/25"
-                        >
-                            <div class="rounded-lg bg-amber-400/15 p-2">
-                                <svg class="h-5 w-5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75H16.5v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75H16.5v-.75z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="text-sm font-semibold text-white">MPKK</div>
+                                <div class="text-sm font-semibold text-white">Jana QR Code</div>
                                 <div class="text-xs text-sky-200/50">QR kehadiran</div>
                             </div>
                         </Link>

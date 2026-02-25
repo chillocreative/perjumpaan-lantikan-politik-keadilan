@@ -93,8 +93,8 @@ class AttendanceService
                 ]);
             }
 
-            if ($this->repository->existsForMeetingIcAndCategory($meetingId, $icHash, $category->value)) {
-                throw new \DomainException('IC ini sudah membuat pengesahan untuk mesyuarat ini bagi kategori ini.');
+            if ($this->repository->existsForMeetingAndIcHash($meetingId, $icHash)) {
+                throw new \DomainException('IC ini sudah membuat pengesahan untuk mesyuarat ini.');
             }
 
             return $this->repository->createRecord([

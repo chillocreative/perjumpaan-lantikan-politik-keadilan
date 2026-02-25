@@ -47,11 +47,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/export/attendance-pdf', [ExportController::class, 'attendancePdf'])->name('export.attendance.pdf');
     Route::get('/export/members-pdf', [ExportController::class, 'membersPdf'])->name('export.members.pdf');
 
-    // QR code display pages (admin)
-    Route::get('/qr/matc', [QrAttendanceController::class, 'show'])->defaults('category', 'matc')->name('admin.qr.matc');
-    Route::get('/qr/amk', [QrAttendanceController::class, 'show'])->defaults('category', 'amk')->name('admin.qr.amk');
-    Route::get('/qr/wanita', [QrAttendanceController::class, 'show'])->defaults('category', 'wanita')->name('admin.qr.wanita');
-    Route::get('/qr/mpkk', [QrAttendanceController::class, 'show'])->defaults('category', 'mpkk')->name('admin.qr.mpkk');
+    // QR code display page (admin)
+    Route::get('/qr', [QrAttendanceController::class, 'showQr'])->name('admin.qr');
 });
 
 // Public category attendance form pages
