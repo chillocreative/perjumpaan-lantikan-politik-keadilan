@@ -31,8 +31,10 @@ class MemberController extends Controller
                 $request->query('search'),
                 15,
                 $request->query('category'),
+                $request->query('mpkk'),
             ),
-            'filters' => $request->only('search', 'category'),
+            'mpkkList' => $this->service->getMpkkList(),
+            'filters' => $request->only('search', 'category', 'mpkk'),
         ]);
     }
 

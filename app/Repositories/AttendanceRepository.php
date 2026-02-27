@@ -22,7 +22,7 @@ class AttendanceRepository
             ->get();
     }
 
-    public function getByMeetingFiltered(int $meetingId, ?string $category): Collection
+    public function getByMeetingFiltered(int $meetingId, ?string $category, ?string $mpkk = null): Collection
     {
         return $this->model
             ->where('meeting_id', $meetingId)
@@ -30,6 +30,10 @@ class AttendanceRepository
             ->when($category, fn ($query) => $query->whereHas(
                 'member',
                 fn ($q) => $q->where('category_type', $category),
+            ))
+            ->when($mpkk, fn ($query) => $query->whereHas(
+                'member',
+                fn ($q) => $q->where('position_name', $mpkk),
             ))
             ->latest('created_at')
             ->get();

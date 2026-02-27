@@ -31,16 +31,18 @@ class AttendanceController extends Controller
 
         $meetingId = $request->query('meeting_id');
         $category = $request->query('category');
+        $mpkk = $request->query('mpkk');
         $meeting = $meetingId ? $this->meetingService->find((int) $meetingId) : null;
         $attendances = $meetingId
-            ? $this->attendanceService->getByMeetingFiltered((int) $meetingId, $category)
+            ? $this->attendanceService->getByMeetingFiltered((int) $meetingId, $category, $mpkk)
             : collect();
 
         return Inertia::render('Attendance/Index', [
             'meetings' => $this->meetingService->list(null, 100),
             'meeting' => $meeting,
             'attendances' => $attendances,
-            'filters' => $request->only('meeting_id', 'category'),
+            'mpkkList' => $this->memberService->getMpkkList(),
+            'filters' => $request->only('meeting_id', 'category', 'mpkk'),
         ]);
     }
 

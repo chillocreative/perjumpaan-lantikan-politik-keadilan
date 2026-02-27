@@ -16,7 +16,7 @@ class MemberRepository extends BaseRepository implements MemberRepositoryInterfa
         parent::__construct($model);
     }
 
-    public function search(string $query, int $perPage = 15, ?string $category = null): LengthAwarePaginator
+    public function search(string $query, int $perPage = 15, ?string $category = null, ?string $mpkk = null): LengthAwarePaginator
     {
         return $this->model
             ->where(function ($q) use ($query) {
@@ -24,16 +24,29 @@ class MemberRepository extends BaseRepository implements MemberRepositoryInterfa
                     ->orWhere('ic_number_hash', IcHasher::hash($query));
             })
             ->when($category, fn ($q) => $q->where('category_type', $category))
+            ->when($mpkk, fn ($q) => $q->where('position_name', $mpkk))
             ->latest('created_at')
             ->paginate($perPage);
     }
 
-    public function paginateByCategory(string $category, int $perPage = 15): LengthAwarePaginator
+    public function paginateByCategory(string $category, int $perPage = 15, ?string $mpkk = null): LengthAwarePaginator
     {
         return $this->model
             ->where('category_type', $category)
+            ->when($mpkk, fn ($q) => $q->where('position_name', $mpkk))
             ->latest('created_at')
             ->paginate($perPage);
+    }
+
+    public function getMpkkList(): array
+    {
+        return $this->model
+            ->where('category_type', 'mpkk')
+            ->whereNotNull('position_name')
+            ->distinct()
+            ->orderBy('position_name')
+            ->pluck('position_name')
+            ->toArray();
     }
 
     public function findByIdForUpdate(int $id): Member

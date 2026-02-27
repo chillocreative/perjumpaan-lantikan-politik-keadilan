@@ -14,17 +14,22 @@ class MemberService
         private readonly MemberRepositoryInterface $repository,
     ) {}
 
-    public function list(?string $search, int $perPage = 15, ?string $category = null): LengthAwarePaginator
+    public function list(?string $search, int $perPage = 15, ?string $category = null, ?string $mpkk = null): LengthAwarePaginator
     {
         if ($search) {
-            return $this->repository->search($search, $perPage, $category);
+            return $this->repository->search($search, $perPage, $category, $mpkk);
         }
 
         if ($category) {
-            return $this->repository->paginateByCategory($category, $perPage);
+            return $this->repository->paginateByCategory($category, $perPage, $mpkk);
         }
 
         return $this->repository->paginate($perPage);
+    }
+
+    public function getMpkkList(): array
+    {
+        return $this->repository->getMpkkList();
     }
 
     public function find(int $id): Model

@@ -2,20 +2,26 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
+import { useDragScroll } from '@/composables/useDragScroll.js';
 
 const props = defineProps({
     members: Object,
     filters: Object,
+    mpkkList: Array,
 });
 
 const page = usePage();
 const search = ref(props.filters.search || '');
 const selectedCategory = ref(props.filters.category || '');
+const selectedMpkk = ref(props.filters.mpkk || '');
+
+const { scrollEl, onMouseDown, onMouseLeave, onMouseUp, onMouseMove } = useDragScroll();
 
 function applyFilters() {
     const params = {};
     if (search.value) params.search = search.value;
     if (selectedCategory.value) params.category = selectedCategory.value;
+    if (selectedCategory.value === 'mpkk' && selectedMpkk.value) params.mpkk = selectedMpkk.value;
     router.get(route('members.index'), params, {
         preserveState: true,
         replace: true,
@@ -25,8 +31,17 @@ function applyFilters() {
 watch(search, () => applyFilters());
 
 function onCategoryChange() {
+    selectedMpkk.value = '';
     applyFilters();
 }
+
+function onMpkkChange() {
+    applyFilters();
+}
+
+watch(selectedCategory, (val) => {
+    if (val !== 'mpkk') selectedMpkk.value = '';
+});
 
 function destroy(id) {
     if (confirm('Adakah anda pasti mahu memadam ahli ini?')) {
@@ -66,7 +81,7 @@ const categoryLabels = {
                 </div>
 
                 <div class="mb-4 flex flex-wrap items-end gap-4">
-                    <div>
+                    <div class="w-full sm:w-auto">
                         <label class="block text-sm font-medium text-sky-100/80 mb-1">Cari</label>
                         <input
                             v-model="search"
@@ -75,7 +90,7 @@ const categoryLabels = {
                             class="w-full rounded-md border-0 bg-white/10 text-white ring-1 ring-white/15 placeholder-sky-200/40 focus:ring-2 focus:ring-sky-400 sm:w-64"
                         />
                     </div>
-                    <div>
+                    <div class="w-full sm:w-auto">
                         <label class="block text-sm font-medium text-sky-100/80 mb-1">Kategori</label>
                         <select
                             v-model="selectedCategory"
@@ -89,9 +104,22 @@ const categoryLabels = {
                             <option value="mpkk" class="bg-sky-900 text-white">MPKK</option>
                         </select>
                     </div>
+                    <div v-if="selectedCategory === 'mpkk'" class="w-full sm:w-auto">
+                        <label class="block text-sm font-medium text-sky-100/80 mb-1">MPKK</label>
+                        <select
+                            v-model="selectedMpkk"
+                            @change="onMpkkChange"
+                            class="w-full rounded-md border-0 bg-white/10 text-white ring-1 ring-white/15 focus:ring-2 focus:ring-sky-400 sm:w-64"
+                        >
+                            <option value="" class="bg-sky-900 text-white">Semua MPKK</option>
+                            <option v-for="mpkk in mpkkList" :key="mpkk" :value="mpkk" class="bg-sky-900 text-white">
+                                {{ mpkk }}
+                            </option>
+                        </select>
+                    </div>
                     <a
                         v-if="selectedCategory"
-                        :href="route('export.members.pdf', { category: selectedCategory })"
+                        :href="route('export.members.pdf', { category: selectedCategory, mpkk: selectedMpkk || undefined })"
                         class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500"
                     >
                         Muat Turun PDF
@@ -99,18 +127,25 @@ const categoryLabels = {
                 </div>
 
                 <div class="overflow-hidden rounded-2xl bg-white/10 shadow-lg backdrop-blur-md ring-1 ring-white/15">
-                    <div class="overflow-x-auto">
+                    <div
+                        ref="scrollEl"
+                        class="overflow-x-auto cursor-grab"
+                        @mousedown="onMouseDown"
+                        @mouseleave="onMouseLeave"
+                        @mouseup="onMouseUp"
+                        @mousemove="onMouseMove"
+                    >
                         <table class="min-w-full divide-y divide-white/10">
                             <thead class="bg-white/5">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">Nama</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">No. IC</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">Kategori</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">Jawatan</th>
-                                    <th v-if="selectedCategory === 'mpkk'" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">MPKK</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">Telefon</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60">Alamat</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-sky-200/60">Tindakan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60 whitespace-nowrap">Nama</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60 whitespace-nowrap">No. IC</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60 whitespace-nowrap">Kategori</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60 whitespace-nowrap">Jawatan</th>
+                                    <th v-if="selectedCategory === 'mpkk'" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60 whitespace-nowrap">MPKK</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60 whitespace-nowrap">Telefon</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-sky-200/60 whitespace-nowrap">Alamat</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-sky-200/60 whitespace-nowrap">Tindakan</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/10">
@@ -129,7 +164,7 @@ const categoryLabels = {
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-sky-200/50 uppercase">{{ member.position_type || '-' }}</td>
                                     <td v-if="selectedCategory === 'mpkk'" class="whitespace-nowrap px-6 py-4 text-sm text-sky-200/50 uppercase">{{ member.position_name || '-' }}</td>
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-sky-200/50 uppercase">{{ member.phone_number }}</td>
-                                    <td class="px-6 py-4 text-sm text-sky-200/50 uppercase">{{ member.address || '-' }}</td>
+                                    <td class="px-6 py-4 text-sm text-sky-200/50 uppercase min-w-[12rem]">{{ member.address || '-' }}</td>
                                     <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
                                         <template v-if="page.props.auth.user.is_admin">
                                             <Link :href="route('members.edit', member.id)" class="text-sky-300 hover:text-sky-200 mr-3">Ubah</Link>

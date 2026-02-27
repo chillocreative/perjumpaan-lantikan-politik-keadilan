@@ -27,9 +27,9 @@ class AttendanceService
         return $this->repository->getByMeeting($meetingId);
     }
 
-    public function getByMeetingFiltered(int $meetingId, ?string $category): Collection
+    public function getByMeetingFiltered(int $meetingId, ?string $category, ?string $mpkk = null): Collection
     {
-        return $this->repository->getByMeetingFiltered($meetingId, $category);
+        return $this->repository->getByMeetingFiltered($meetingId, $category, $mpkk);
     }
 
     public function markAttendance(int $meetingId, array $attendances): void

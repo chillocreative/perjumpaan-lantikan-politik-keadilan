@@ -31,9 +31,10 @@ class ExportController extends Controller
 
         $meetingId = (int) $request->query('meeting_id');
         $category = $request->query('category');
+        $mpkk = $request->query('mpkk');
 
         $meeting = $this->meetingService->find($meetingId);
-        $attendances = $this->attendanceService->getByMeetingFiltered($meetingId, $category);
+        $attendances = $this->attendanceService->getByMeetingFiltered($meetingId, $category, $mpkk);
         $categoryEnum = CategoryType::fromSlug($category);
 
         $rows = $attendances->map(fn ($a) => [
@@ -67,9 +68,11 @@ class ExportController extends Controller
         ]);
 
         $category = $request->query('category');
+        $mpkk = $request->query('mpkk');
         $categoryEnum = CategoryType::fromSlug($category);
 
         $members = Member::where('category_type', $category)
+            ->when($mpkk, fn ($q) => $q->where('position_name', $mpkk))
             ->orderBy('name')
             ->get();
 
