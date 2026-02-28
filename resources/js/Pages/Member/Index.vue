@@ -97,14 +97,30 @@ async function downloadPdf() {
         window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
         const status = error.response?.status;
+        let detail = '';
+
+        if (error.response?.data instanceof Blob) {
+            try {
+                const text = await error.response.data.text();
+                const json = JSON.parse(text);
+                if (json.errors) {
+                    detail = Object.values(json.errors).flat().join(', ');
+                } else if (json.message) {
+                    detail = json.message;
+                }
+            } catch {
+                // Not JSON, ignore
+            }
+        }
+
         if (status === 401 || status === 419) {
             downloadError.value = 'Sesi anda telah tamat. Sila muat semula halaman dan log masuk semula.';
         } else if (status === 403) {
             downloadError.value = 'Anda tidak dibenarkan memuat turun PDF ini.';
         } else if (status === 422) {
-            downloadError.value = 'Parameter tidak sah. Sila pilih kategori.';
+            downloadError.value = 'Ralat pengesahan: ' + (detail || 'Parameter tidak sah.');
         } else {
-            downloadError.value = 'Gagal muat turun PDF (Ralat ' + (status || 'rangkaian') + '). Sila cuba lagi.';
+            downloadError.value = 'Gagal muat turun PDF (Ralat ' + (status || 'rangkaian') + '). ' + (detail || 'Sila cuba lagi.');
         }
     } finally {
         downloading.value = false;
