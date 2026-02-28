@@ -76,4 +76,10 @@ Route::post('/hadir/{category}/{meeting}', [QrAttendanceController::class, 'veri
     ->name('hadir.verify')
     ->middleware(['signed', 'throttle:verify-attendance', 'honeypot']);
 
+// Temporary test route - DELETE AFTER DEBUGGING
+Route::get('/test-pdf', function () {
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML('<html><body><h1>PDF Download Test</h1><p>If you see this PDF, downloads work correctly.</p><p>Generated: ' . now() . '</p></body></html>')->setPaper('a4');
+    return $pdf->download('test-pdf.pdf');
+});
+
 require __DIR__.'/auth.php';

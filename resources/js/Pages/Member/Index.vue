@@ -56,6 +56,8 @@ const categoryLabels = {
     mpkk: 'MPKK',
 };
 
+const pdfLoading = ref(false);
+
 function downloadPdf() {
     const params = new URLSearchParams({
         category: selectedCategory.value,
@@ -63,7 +65,19 @@ function downloadPdf() {
     if (selectedMpkk.value) {
         params.set('mpkk', selectedMpkk.value);
     }
-    window.location.href = '/export/members-pdf?' + params.toString();
+    const url = '/export/members-pdf?' + params.toString();
+
+    pdfLoading.value = true;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+    document.body.appendChild(iframe);
+
+    setTimeout(() => {
+        pdfLoading.value = false;
+        iframe.remove();
+    }, 10000);
 }
 </script>
 
@@ -134,9 +148,11 @@ function downloadPdf() {
                         v-if="selectedCategory"
                         type="button"
                         @click="downloadPdf"
-                        class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500"
+                        :disabled="pdfLoading"
+                        class="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500 disabled:opacity-50"
                     >
-                        Muat Turun PDF
+                        <svg v-if="pdfLoading" class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        {{ pdfLoading ? 'Memuat turun...' : 'Muat Turun PDF' }}
                     </button>
                 </div>
 
