@@ -93,7 +93,6 @@ class DashboardController extends Controller
 
         $counts = Attendance::where('attendances.meeting_id', $meeting->id)
             ->where('attendances.category_type', 'mpkk')
-            ->where('attendances.status', AttendanceStatus::Present->value)
             ->join('members', 'attendances.member_id', '=', 'members.id')
             ->whereIn('members.position_name', $mpkkList)
             ->selectRaw('members.position_name, count(*) as total')
