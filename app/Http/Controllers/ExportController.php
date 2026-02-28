@@ -28,14 +28,6 @@ class ExportController extends Controller
     {
         $this->authorize('viewAny', Attendance::class);
 
-        Log::info('Attendance PDF request', [
-            'all_input' => $request->all(),
-            'query' => $request->query(),
-            'method' => $request->method(),
-            'ajax' => $request->ajax(),
-            'url' => $request->fullUrl(),
-        ]);
-
         $request->validate([
             'meeting_id' => 'required|exists:meetings,id',
             'category' => 'required|string|in:matc,amk,wanita,mpkk',
