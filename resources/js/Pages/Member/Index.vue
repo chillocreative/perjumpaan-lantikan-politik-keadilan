@@ -63,7 +63,7 @@ function downloadPdf() {
     if (selectedMpkk.value) {
         params.set('mpkk', selectedMpkk.value);
     }
-    window.open('/export/members-pdf?' + params.toString(), '_blank');
+    window.location.href = '/export/members-pdf?' + params.toString();
 }
 </script>
 

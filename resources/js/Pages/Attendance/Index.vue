@@ -81,7 +81,7 @@ function downloadPdf() {
     if (selectedMpkk.value) {
         params.set('mpkk', selectedMpkk.value);
     }
-    window.open('/export/attendance-pdf?' + params.toString(), '_blank');
+    window.location.href = '/export/attendance-pdf?' + params.toString();
 }
 </script>
 
