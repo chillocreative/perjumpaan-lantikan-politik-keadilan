@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useDragScroll } from '@/composables/useDragScroll.js';
 
 const props = defineProps({
@@ -56,39 +56,15 @@ const categoryLabels = {
     mpkk: 'MPKK',
 };
 
-const pdfLoading = ref(false);
-
-async function downloadPdf() {
+const pdfUrl = computed(() => {
     const params = new URLSearchParams({
         category: selectedCategory.value,
     });
     if (selectedMpkk.value) {
         params.set('mpkk', selectedMpkk.value);
     }
-
-    pdfLoading.value = true;
-    try {
-        const response = await fetch('/export/members-pdf?' + params.toString(), {
-            credentials: 'same-origin',
-            headers: { 'Accept': 'application/pdf' },
-        });
-        if (!response.ok) throw new Error('Server returned ' + response.status);
-
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = response.headers.get('Content-Disposition')?.match(/filename="?(.+?)"?$/)?.[1] || 'ahli.pdf';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-    } catch (e) {
-        alert('Gagal muat turun PDF: ' + e.message);
-    } finally {
-        pdfLoading.value = false;
-    }
-}
+    return '/export/members-pdf?' + params.toString();
+});
 </script>
 
 <template>
@@ -154,16 +130,13 @@ async function downloadPdf() {
                             </option>
                         </select>
                     </div>
-                    <button
+                    <a
                         v-if="selectedCategory"
-                        type="button"
-                        @click="downloadPdf"
-                        :disabled="pdfLoading"
-                        class="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500 disabled:opacity-50"
+                        :href="pdfUrl"
+                        class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500"
                     >
-                        <svg v-if="pdfLoading" class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                        {{ pdfLoading ? 'Memuat turun...' : 'Muat Turun PDF' }}
-                    </button>
+                        Muat Turun PDF
+                    </a>
                 </div>
 
                 <div class="overflow-hidden rounded-2xl bg-white/10 shadow-lg backdrop-blur-md ring-1 ring-white/15">
