@@ -68,7 +68,7 @@ class DashboardController extends Controller
             'MPKK PERMATANG RAMBAI',
             'MPKK JALAN KEDAH',
             'MPKK PADANG BENGGALI',
-            'MPKK DUN PENAGA',
+            'MPKK KUALA MUDA',
         ];
 
         $totals = [
@@ -88,7 +88,7 @@ class DashboardController extends Controller
             'MPKK PERMATANG RAMBAI' => 15,
             'MPKK JALAN KEDAH' => 11,
             'MPKK PADANG BENGGALI' => 12,
-            'MPKK DUN PENAGA' => 14,
+            'MPKK KUALA MUDA' => 14,
         ];
 
         $counts = Attendance::where('attendances.meeting_id', $meeting->id)
