@@ -50,15 +50,19 @@ class ExportController extends Controller
 
         $dateFormatted = $meeting->date->format('d-m-Y');
 
-        $pdf = Pdf::loadView('pdf.attendance', [
-            'meetingTitle' => $meeting->title,
-            'meetingDate' => $dateFormatted,
-            'categoryLabel' => $categoryEnum->label(),
-            'isMpkk' => $categoryEnum === CategoryType::Mpkk,
-            'rows' => $rows,
-        ])->setPaper('a4', 'landscape');
+        try {
+            $pdf = Pdf::loadView('pdf.attendance', [
+                'meetingTitle' => $meeting->title,
+                'meetingDate' => $dateFormatted,
+                'categoryLabel' => $categoryEnum->label(),
+                'isMpkk' => $categoryEnum === CategoryType::Mpkk,
+                'rows' => $rows,
+            ])->setPaper('a4', 'landscape');
 
-        return $pdf->download("kehadiran-{$category}-{$dateFormatted}.pdf");
+            return $pdf->download("kehadiran-{$category}-{$dateFormatted}.pdf");
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal menjana PDF. Sila cuba lagi.');
+        }
     }
 
     public function membersPdf(Request $request): Response
@@ -87,13 +91,17 @@ class ExportController extends Controller
             'position_name' => $m->position_name,
         ])->toArray();
 
-        $pdf = Pdf::loadView('pdf.members', [
-            'categoryLabel' => $categoryEnum->label(),
-            'isMpkk' => $categoryEnum === CategoryType::Mpkk,
-            'generatedAt' => now()->format('d/m/Y H:i'),
-            'rows' => $rows,
-        ])->setPaper('a4', 'landscape');
+        try {
+            $pdf = Pdf::loadView('pdf.members', [
+                'categoryLabel' => $categoryEnum->label(),
+                'isMpkk' => $categoryEnum === CategoryType::Mpkk,
+                'generatedAt' => now()->format('d/m/Y H:i'),
+                'rows' => $rows,
+            ])->setPaper('a4', 'landscape');
 
-        return $pdf->download("ahli-{$category}.pdf");
+            return $pdf->download("ahli-{$category}.pdf");
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal menjana PDF. Sila cuba lagi.');
+        }
     }
 }

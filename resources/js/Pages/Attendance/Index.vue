@@ -140,7 +140,7 @@ const statusColors = {
                             <div class="flex items-center gap-2">
                                 <a
                                     v-if="selectedCategory"
-                                    :href="route('export.attendance.pdf', { meeting_id: selectedMeeting, category: selectedCategory, mpkk: selectedMpkk || undefined })"
+                                    :href="route('export.attendance.pdf', { meeting_id: selectedMeeting, category: selectedCategory, mpkk: selectedMpkk || undefined }, false)"
                                     class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500"
                                 >
                                     Muat Turun PDF

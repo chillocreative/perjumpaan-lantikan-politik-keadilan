@@ -119,7 +119,7 @@ const categoryLabels = {
                     </div>
                     <a
                         v-if="selectedCategory"
-                        :href="route('export.members.pdf', { category: selectedCategory, mpkk: selectedMpkk || undefined })"
+                        :href="route('export.members.pdf', { category: selectedCategory, mpkk: selectedMpkk || undefined }, false)"
                         class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500"
                     >
                         Muat Turun PDF
