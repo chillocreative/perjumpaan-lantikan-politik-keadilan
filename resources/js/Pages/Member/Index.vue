@@ -58,26 +58,36 @@ const categoryLabels = {
 
 const pdfLoading = ref(false);
 
-function downloadPdf() {
+async function downloadPdf() {
     const params = new URLSearchParams({
         category: selectedCategory.value,
     });
     if (selectedMpkk.value) {
         params.set('mpkk', selectedMpkk.value);
     }
-    const url = '/export/members-pdf?' + params.toString();
 
     pdfLoading.value = true;
+    try {
+        const response = await fetch('/export/members-pdf?' + params.toString(), {
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/pdf' },
+        });
+        if (!response.ok) throw new Error('Server returned ' + response.status);
 
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = url;
-    document.body.appendChild(iframe);
-
-    setTimeout(() => {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.headers.get('Content-Disposition')?.match(/filename="?(.+?)"?$/)?.[1] || 'ahli.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        alert('Gagal muat turun PDF: ' + e.message);
+    } finally {
         pdfLoading.value = false;
-        iframe.remove();
-    }, 10000);
+    }
 }
 </script>
 

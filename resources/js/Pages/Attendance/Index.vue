@@ -75,7 +75,7 @@ const statusColors = {
 
 const pdfLoading = ref(false);
 
-function downloadPdf() {
+async function downloadPdf() {
     const params = new URLSearchParams({
         meeting_id: selectedMeeting.value,
         category: selectedCategory.value,
@@ -83,21 +83,29 @@ function downloadPdf() {
     if (selectedMpkk.value) {
         params.set('mpkk', selectedMpkk.value);
     }
-    const url = '/export/attendance-pdf?' + params.toString();
 
     pdfLoading.value = true;
+    try {
+        const response = await fetch('/export/attendance-pdf?' + params.toString(), {
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/pdf' },
+        });
+        if (!response.ok) throw new Error('Server returned ' + response.status);
 
-    // Use hidden iframe to trigger download without navigating away
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = url;
-    document.body.appendChild(iframe);
-
-    // Reset loading state and cleanup after timeout
-    setTimeout(() => {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.headers.get('Content-Disposition')?.match(/filename="?(.+?)"?$/)?.[1] || 'kehadiran.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        alert('Gagal muat turun PDF: ' + e.message);
+    } finally {
         pdfLoading.value = false;
-        iframe.remove();
-    }, 10000);
+    }
 }
 </script>
 
