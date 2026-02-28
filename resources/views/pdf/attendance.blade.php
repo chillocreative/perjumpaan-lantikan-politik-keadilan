@@ -21,6 +21,10 @@
         tr:nth-child(even) { background-color: #ddeef6; }
         tr:nth-child(odd) { background-color: #fff; }
         .no-col { width: 5%; text-align: center; }
+        .status-hadir { color: #166534; font-weight: bold; }
+        .status-tidak-hadir { color: #991b1b; font-weight: bold; }
+        .status-lewat { color: #854d0e; font-weight: bold; }
+        .status-dimaafkan { color: #1e40af; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -39,10 +43,21 @@
                 @endif
                 <th>No Telefon</th>
                 <th>Alamat</th>
+                <th>Status</th>
+                <th>Sebab</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($rows as $i => $row)
+                @php
+                    $statusClass = match($row['status'] ?? '') {
+                        'Hadir' => 'status-hadir',
+                        'Tidak Hadir' => 'status-tidak-hadir',
+                        'Lewat' => 'status-lewat',
+                        'Dimaafkan' => 'status-dimaafkan',
+                        default => '',
+                    };
+                @endphp
                 <tr>
                     <td class="no-col">{{ $i + 1 }}</td>
                     <td>{{ $row['name'] }}</td>
@@ -53,9 +68,11 @@
                     @endif
                     <td>{{ $row['phone_number'] ?? '-' }}</td>
                     <td>{{ $row['address'] ?? '-' }}</td>
+                    <td class="{{ $statusClass }}">{{ $row['status'] ?? '-' }}</td>
+                    <td>{{ ($row['status'] === 'Tidak Hadir' && !empty($row['absence_reason'])) ? $row['absence_reason'] : '-' }}</td>
                 </tr>
             @empty
-                <tr><td colspan="{{ $isMpkk ? 7 : 6 }}" style="text-align:center;">Tiada rekod.</td></tr>
+                <tr><td colspan="{{ $isMpkk ? 9 : 8 }}" style="text-align:center;">Tiada rekod.</td></tr>
             @endforelse
         </tbody>
     </table>

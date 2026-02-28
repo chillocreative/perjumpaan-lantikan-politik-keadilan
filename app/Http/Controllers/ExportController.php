@@ -44,6 +44,8 @@ class ExportController extends Controller
             'address' => $a->member?->address,
             'position_type' => $a->member?->position_type,
             'position_name' => $a->member?->position_name,
+            'status' => $a->status?->label(),
+            'absence_reason' => $a->absence_reason,
         ])->toArray();
 
         $dateFormatted = $meeting->date->format('d-m-Y');
