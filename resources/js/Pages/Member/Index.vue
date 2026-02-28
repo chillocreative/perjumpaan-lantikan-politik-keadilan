@@ -79,6 +79,9 @@ const categoryLabels = {
                 <div v-if="page.props.flash.success" class="mb-4 rounded-md bg-emerald-400/15 p-4 ring-1 ring-emerald-400/20">
                     <p class="text-sm text-emerald-300">{{ page.props.flash.success }}</p>
                 </div>
+                <div v-if="page.props.flash.error" class="mb-4 rounded-md bg-red-400/15 p-4 ring-1 ring-red-400/20">
+                    <p class="text-sm text-red-300">{{ page.props.flash.error }}</p>
+                </div>
 
                 <div class="mb-4 flex flex-wrap items-end gap-4">
                     <div class="w-full sm:w-auto">

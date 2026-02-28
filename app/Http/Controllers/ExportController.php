@@ -11,6 +11,7 @@ use App\Services\AttendanceService;
 use App\Services\MeetingService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class ExportController extends Controller
@@ -61,7 +62,9 @@ class ExportController extends Controller
 
             return $pdf->download("kehadiran-{$category}-{$dateFormatted}.pdf");
         } catch (\Throwable $e) {
-            return redirect()->back()->with('error', 'Gagal menjana PDF. Sila cuba lagi.');
+            Log::error('Attendance PDF export failed', ['error' => $e->getMessage()]);
+
+            return redirect()->back()->with('error', 'Gagal menjana PDF: '.$e->getMessage());
         }
     }
 
@@ -101,7 +104,9 @@ class ExportController extends Controller
 
             return $pdf->download("ahli-{$category}.pdf");
         } catch (\Throwable $e) {
-            return redirect()->back()->with('error', 'Gagal menjana PDF. Sila cuba lagi.');
+            Log::error('Members PDF export failed', ['error' => $e->getMessage()]);
+
+            return redirect()->back()->with('error', 'Gagal menjana PDF: '.$e->getMessage());
         }
     }
 }
