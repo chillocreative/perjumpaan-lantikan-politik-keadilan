@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import { useDragScroll } from '@/composables/useDragScroll.js';
+import axios from 'axios';
 
 const props = defineProps({
     meetings: Object,
@@ -73,7 +74,13 @@ const statusColors = {
     excused: 'bg-white/10 text-sky-200 ring-1 ring-white/15',
 };
 
-const pdfUrl = computed(() => {
+const downloading = ref(false);
+const downloadError = ref('');
+
+async function downloadPdf() {
+    downloading.value = true;
+    downloadError.value = '';
+
     const params = new URLSearchParams({
         meeting_id: selectedMeeting.value,
         category: selectedCategory.value,
@@ -81,8 +88,47 @@ const pdfUrl = computed(() => {
     if (selectedMpkk.value) {
         params.set('mpkk', selectedMpkk.value);
     }
-    return '/export/attendance-pdf?' + params.toString();
-});
+    const url = '/export/attendance-pdf?' + params.toString();
+
+    try {
+        const response = await axios.get(url, { responseType: 'blob' });
+
+        const contentType = response.headers['content-type'] || '';
+        if (!contentType.includes('application/pdf')) {
+            const text = await response.data.text();
+            downloadError.value = 'Respons bukan PDF. Sila muat semula halaman dan cuba lagi.';
+            return;
+        }
+
+        const disposition = response.headers['content-disposition'] || '';
+        let filename = 'kehadiran.pdf';
+        const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (match) filename = match[1].replace(/['"]/g, '');
+
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+        const status = error.response?.status;
+        if (status === 401 || status === 419) {
+            downloadError.value = 'Sesi anda telah tamat. Sila muat semula halaman dan log masuk semula.';
+        } else if (status === 403) {
+            downloadError.value = 'Anda tidak dibenarkan memuat turun PDF ini.';
+        } else if (status === 422) {
+            downloadError.value = 'Parameter tidak sah. Sila pilih mesyuarat dan kategori.';
+        } else {
+            downloadError.value = 'Gagal muat turun PDF (Ralat ' + (status || 'rangkaian') + '). Sila cuba lagi.';
+        }
+    } finally {
+        downloading.value = false;
+    }
+}
 </script>
 
 <template>
@@ -147,18 +193,23 @@ const pdfUrl = computed(() => {
                     </div>
                 </div>
 
+                <div v-if="downloadError" class="mb-4 rounded-md bg-red-400/15 p-4 ring-1 ring-red-400/20">
+                    <p class="text-sm text-red-300">{{ downloadError }}</p>
+                </div>
+
                 <div v-if="meeting" class="overflow-hidden rounded-2xl bg-white/10 shadow-lg backdrop-blur-md ring-1 ring-white/15">
                     <div class="p-4 sm:p-6">
                         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                             <h3 class="text-lg font-medium text-white">{{ meeting.title }}</h3>
                             <div class="flex items-center gap-2">
-                                <a
+                                <button
                                     v-if="selectedCategory"
-                                    :href="pdfUrl"
-                                    class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500"
+                                    @click="downloadPdf"
+                                    :disabled="downloading"
+                                    class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-wait"
                                 >
-                                    Muat Turun PDF
-                                </a>
+                                    {{ downloading ? 'Memuat turun...' : 'Muat Turun PDF' }}
+                                </button>
                                 <Link
                                     v-if="page.props.auth.user.is_admin"
                                     :href="route('attendances.mark', meeting.id)"
