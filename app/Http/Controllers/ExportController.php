@@ -11,6 +11,7 @@ use App\Services\AttendanceService;
 use App\Services\MeetingService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,7 +20,9 @@ class ExportController extends Controller
     public function __construct(
         private readonly AttendanceService $attendanceService,
         private readonly MeetingService $meetingService,
-    ) {}
+    ) {
+        File::ensureDirectoryExists(storage_path('fonts'));
+    }
 
     public function attendancePdf(Request $request): Response
     {
