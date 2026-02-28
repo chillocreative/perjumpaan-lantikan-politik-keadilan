@@ -72,6 +72,17 @@ const statusColors = {
     late: 'bg-yellow-400/15 text-yellow-300 ring-1 ring-yellow-400/20',
     excused: 'bg-white/10 text-sky-200 ring-1 ring-white/15',
 };
+
+function downloadPdf() {
+    const params = new URLSearchParams({
+        meeting_id: selectedMeeting.value,
+        category: selectedCategory.value,
+    });
+    if (selectedMpkk.value) {
+        params.set('mpkk', selectedMpkk.value);
+    }
+    window.open('/export/attendance-pdf?' + params.toString(), '_blank');
+}
 </script>
 
 <template>
@@ -141,13 +152,14 @@ const statusColors = {
                         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                             <h3 class="text-lg font-medium text-white">{{ meeting.title }}</h3>
                             <div class="flex items-center gap-2">
-                                <a
+                                <button
                                     v-if="selectedCategory"
-                                    :href="route('export.attendance.pdf', { meeting_id: selectedMeeting, category: selectedCategory, mpkk: selectedMpkk || undefined }, false)"
+                                    type="button"
+                                    @click="downloadPdf"
                                     class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500"
                                 >
                                     Muat Turun PDF
-                                </a>
+                                </button>
                                 <Link
                                     v-if="page.props.auth.user.is_admin"
                                     :href="route('attendances.mark', meeting.id)"

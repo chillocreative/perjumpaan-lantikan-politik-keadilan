@@ -55,6 +55,16 @@ const categoryLabels = {
     wanita: 'Wanita Cabang',
     mpkk: 'MPKK',
 };
+
+function downloadPdf() {
+    const params = new URLSearchParams({
+        category: selectedCategory.value,
+    });
+    if (selectedMpkk.value) {
+        params.set('mpkk', selectedMpkk.value);
+    }
+    window.open('/export/members-pdf?' + params.toString(), '_blank');
+}
 </script>
 
 <template>
@@ -120,13 +130,14 @@ const categoryLabels = {
                             </option>
                         </select>
                     </div>
-                    <a
+                    <button
                         v-if="selectedCategory"
-                        :href="route('export.members.pdf', { category: selectedCategory, mpkk: selectedMpkk || undefined }, false)"
+                        type="button"
+                        @click="downloadPdf"
                         class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500"
                     >
                         Muat Turun PDF
-                    </a>
+                    </button>
                 </div>
 
                 <div class="overflow-hidden rounded-2xl bg-white/10 shadow-lg backdrop-blur-md ring-1 ring-white/15">
